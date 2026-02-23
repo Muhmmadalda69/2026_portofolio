@@ -1,11 +1,17 @@
 #!/bin/sh
+set -e
 
-# Seed the database or run migrations if needed
-# Since it's SQLite, we can use prisma db push for simplicity in some cases,
-# or prisma migrate deploy if using migrations.
-echo "Running database migrations..."
+# Run database setup
+echo "Starting database setup..."
+if [ -z "$DATABASE_URL" ]; then
+  echo "Error: DATABASE_URL is not set."
+  exit 1
+fi
+
+echo "Syncing database with schema (npx prisma db push)..."
 npx prisma db push --accept-data-loss
 
 # Start the application
-echo "Starting application..."
-node server.js
+echo "Starting Next.js standalone server..."
+exec node server.js
+

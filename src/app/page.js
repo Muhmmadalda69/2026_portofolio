@@ -11,14 +11,19 @@ import Footer from "@/components/Footer";
 export const dynamic = "force-dynamic";
 
 async function getData() {
-  const [profile, experiences, projects, skills] = await Promise.all([
-    prisma.profile.findFirst(),
-    prisma.experience.findMany({ orderBy: { order: "asc" } }),
-    prisma.project.findMany({ orderBy: { order: "asc" } }),
-    prisma.skill.findMany({ orderBy: { order: "asc" } }),
-  ]);
+  try {
+    const [profile, experiences, projects, skills] = await Promise.all([
+      prisma.profile.findFirst().catch(() => null),
+      prisma.experience.findMany({ orderBy: { order: "asc" } }).catch(() => []),
+      prisma.project.findMany({ orderBy: { order: "asc" } }).catch(() => []),
+      prisma.skill.findMany({ orderBy: { order: "asc" } }).catch(() => []),
+    ]);
 
-  return { profile, experiences, projects, skills };
+    return { profile, experiences, projects, skills };
+  } catch (error) {
+    console.error("Database fetch error:", error);
+    return { profile: null, experiences: [], projects: [], skills: [] };
+  }
 }
 
 export default async function Home() {
