@@ -12,6 +12,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Dummy DATABASE_URL for build time (needed by prisma.config.ts)
+ENV DATABASE_URL="file:./dev.db"
+
 # Generate Prisma Client
 RUN npx prisma generate
 
