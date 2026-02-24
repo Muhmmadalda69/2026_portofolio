@@ -1,5 +1,8 @@
+echo "pull code ..."
 git pull origin main
-docker compose build
-docker compose up -d
+
+echo "up container ..."
+docker compose down
+docker compose up -d --build
 
 echo "deploy berhasil"

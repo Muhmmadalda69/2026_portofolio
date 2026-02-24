@@ -17,7 +17,8 @@ ENV DATABASE_URL="file:./dev.db"
 
 # Generate Prisma Client
 RUN npx prisma generate
-RUN npx prisma db push
+RUN npx prisma migrate deploy
+RUN node prisma/seed.js
 
 # Build Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
