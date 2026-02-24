@@ -230,13 +230,3 @@ export default function CertificationsAdmin() {
     </div>
   );
 }
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;

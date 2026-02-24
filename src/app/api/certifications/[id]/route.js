@@ -43,13 +43,3 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ error: "Failed to delete certification" }, { status: 500 });
   }
 }
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;

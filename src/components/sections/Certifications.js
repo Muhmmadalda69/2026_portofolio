@@ -131,13 +131,3 @@ export default function Certifications({ certifications }) {
     </section>
   );
 }
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;

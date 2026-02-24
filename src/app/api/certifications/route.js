@@ -34,13 +34,3 @@ export async function POST(request) {
     return NextResponse.json({ error: "Failed to create certification" }, { status: 500 });
   }
 }
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
-创新;
