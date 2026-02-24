@@ -70,3 +70,15 @@ model SkillCategory {
   order    Int     @default(0)
   skills   Skill[]
 }
+
+model Certification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  issuer      String
+  date        String
+  description String?
+  image       String?
+  url         String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}

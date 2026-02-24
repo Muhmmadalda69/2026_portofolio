@@ -12,6 +12,7 @@ const navItems = [
   { label: "Experiences", href: "/admin/experiences", icon: <FiBriefcase /> },
   { label: "Projects", href: "/admin/projects", icon: <FiFolder /> },
   { label: "Skills", href: "/admin/skills", icon: <FiStar /> },
+  { label: "Certifications", href: "/admin/certifications", icon: <FiAward /> },
   { label: "Profile", href: "/admin/profile", icon: <FiUser /> },
 ];
 

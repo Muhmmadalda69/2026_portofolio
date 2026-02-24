@@ -20,6 +20,14 @@ export default function ProfileAdmin() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const [securityForm, setSecurityForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securityStatus, setSecurityStatus] = useState({ type: "", message: "" });
+
   useEffect(() => {
     async function fetchProfile() {
       const res = await fetch("/api/profile");
@@ -36,6 +44,8 @@ export default function ProfileAdmin() {
           phone: data.phone || "",
           resumeUrl: data.resumeUrl || "",
         });
+        // Also pre-fill security email
+        setSecurityForm((prev) => ({ ...prev, email: data.email || "" }));
       }
     }
     fetchProfile();
@@ -64,6 +74,43 @@ export default function ProfileAdmin() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleSecuritySubmit = async (e) => {
+    e.preventDefault();
+    setSecurityStatus({ type: "", message: "" });
+
+    if (securityForm.password && securityForm.password !== securityForm.confirmPassword) {
+      setSecurityStatus({ type: "error", message: "Passwords do not match!" });
+      return;
+    }
+
+    setSecurityLoading(true);
+
+    try {
+      const res = await fetch("/api/admin/security", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: securityForm.email,
+          password: securityForm.password || undefined,
+          name: form.name,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSecurityStatus({ type: "success", message: "Security settings updated! Please re-login if you changed your email or password." });
+        setSecurityForm((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+      } else {
+        setSecurityStatus({ type: "error", message: data.error || "Update failed" });
+      }
+    } catch (err) {
+      setSecurityStatus({ type: "error", message: "An error occurred during update." });
+    }
+
+    setSecurityLoading(false);
   };
 
   return (
@@ -158,6 +205,55 @@ export default function ProfileAdmin() {
             {saved && (
               <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} style={{ color: "#10b981", fontSize: "0.9rem", fontWeight: 500 }}>
                 ✓ Profile saved successfully!
+              </motion.span>
+            )}
+          </div>
+        </form>
+      </motion.div>
+
+      <div className="admin-header" style={{ marginTop: 48 }}>
+        <h1>Security Settings</h1>
+      </div>
+
+      <motion.div className="admin-table-wrapper" style={{ padding: 32, marginBottom: 48 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <form onSubmit={handleSecuritySubmit}>
+          <p style={{ color: "var(--text-muted)", marginBottom: 24, fontSize: "0.95rem" }}>
+            Update your administrative login credentials.
+            <span style={{ color: "var(--accent-pink)", marginLeft: 8 }}>Warning: You may need to log in again after updating these settings.</span>
+          </p>
+
+          <div className="admin-form-group">
+            <label>Login Email</label>
+            <input type="email" value={securityForm.email} onChange={(e) => setSecurityForm({ ...securityForm, email: e.target.value })} required />
+          </div>
+
+          <div className="admin-form-row">
+            <div className="admin-form-group">
+              <label>New Password (leave blank to keep current)</label>
+              <input type="password" value={securityForm.password} onChange={(e) => setSecurityForm({ ...securityForm, password: e.target.value })} autoComplete="new-password" />
+            </div>
+            <div className="admin-form-group">
+              <label>Confirm New Password</label>
+              <input type="password" value={securityForm.confirmPassword} onChange={(e) => setSecurityForm({ ...securityForm, confirmPassword: e.target.value })} autoComplete="new-password" />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 8 }}>
+            <motion.button className="admin-btn admin-btn-primary" type="submit" disabled={securityLoading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <FiSave /> {securityLoading ? "Updating..." : "Update Security Settings"}
+            </motion.button>
+
+            {securityStatus.message && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                style={{
+                  color: securityStatus.type === "success" ? "#10b981" : "#ef4444",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                }}
+              >
+                {securityStatus.type === "success" ? "✓" : "⚠"} {securityStatus.message}
               </motion.span>
             )}
           </div>
