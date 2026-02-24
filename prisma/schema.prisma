@@ -52,10 +52,21 @@ model Project {
 }
 
 model Skill {
-  id       Int    @id @default(autoincrement())
-  name     String
-  category String
-  level    Int    @default(80)
+  id         Int            @id @default(autoincrement())
+  name       String
+  category   String? // Keeping temporarily for migration, made optional
+  level      Int            @default(80)
+  icon       String?
+  order      Int            @default(0)
+  categoryId Int?
+  categoryRel SkillCategory? @relation(fields: [categoryId], references: [id])
+}
+
+model SkillCategory {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
   icon     String?
-  order    Int    @default(0)
+  gradient String?
+  order    Int     @default(0)
+  skills   Skill[]
 }

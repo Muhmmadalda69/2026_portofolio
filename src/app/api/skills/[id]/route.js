@@ -12,9 +12,20 @@ export async function PUT(request, { params }) {
 
     const { id } = await params;
     const data = await request.json();
+
+    // Process data for Prisma
+    const payload = {
+      ...data,
+      categoryId: data.categoryId ? parseInt(data.categoryId) : null,
+    };
+
+    if (!payload.category) {
+      delete payload.category;
+    }
+
     const skill = await prisma.skill.update({
       where: { id: parseInt(id) },
-      data,
+      data: payload,
     });
 
     return NextResponse.json(skill);

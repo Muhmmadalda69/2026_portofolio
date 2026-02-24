@@ -36,7 +36,7 @@ export default function Navbar() {
     <motion.nav className={`navbar ${scrolled ? "scrolled" : ""}`} initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}>
       <div className="container">
         <a href="#home" className="nav-logo" onClick={(e) => handleNavClick(e, "#home")}>
-          <span style={{ color: "var(--accent-pink)" }}>.</span>
+          Portofolio<span style={{ color: "var(--accent-pink)" }}>.</span>
         </a>
 
         <ul className={`nav-links ${mobileOpen ? "open" : ""}`}>

@@ -268,9 +268,9 @@ select {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 4fr;
   align-items: center;
-  gap: 40px;
+  gap: 20px;
   width: 100%;
 }
 
@@ -285,6 +285,7 @@ select {
 .hero-right {
   display: flex;
   flex-direction: column;
+  text-align: justify;
 }
 
 .hero-content {

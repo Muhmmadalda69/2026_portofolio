@@ -7,6 +7,9 @@ export async function GET() {
   try {
     const skills = await prisma.skill.findMany({
       orderBy: { order: "asc" },
+      include: {
+        categoryRel: true,
+      },
     });
     return NextResponse.json(skills);
   } catch (error) {
@@ -22,7 +25,23 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const skill = await prisma.skill.create({ data });
+
+    // Process data for Prisma
+    const payload = {
+      ...data,
+      categoryId: data.categoryId ? parseInt(data.categoryId) : null,
+    };
+
+    // If 'category' is missing but 'categoryId' is present (new behavior),
+    // we can either leave 'category' null (since it's now optional)
+    // or set a placeholder for old logic if needed.
+    if (!payload.category) {
+      delete payload.category;
+    }
+
+    const skill = await prisma.skill.create({
+      data: payload,
+    });
 
     return NextResponse.json(skill, { status: 201 });
   } catch (error) {

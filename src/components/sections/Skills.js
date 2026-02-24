@@ -2,16 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { FiCode, FiServer, FiDatabase, FiTool, FiLayout, FiSmartphone } from "react-icons/fi";
-
-const categoryMeta = {
-  Frontend: { icon: <FiLayout />, gradient: "linear-gradient(135deg, #6c63ff, #a855f7)" },
-  Backend: { icon: <FiServer />, gradient: "linear-gradient(135deg, #10b981, #06b6d4)" },
-  Database: { icon: <FiDatabase />, gradient: "linear-gradient(135deg, #f59e0b, #ef4444)" },
-  Tools: { icon: <FiTool />, gradient: "linear-gradient(135deg, #ec4899, #f97316)" },
-  Mobile: { icon: <FiSmartphone />, gradient: "linear-gradient(135deg, #8b5cf6, #06b6d4)" },
-  Other: { icon: <FiCode />, gradient: "linear-gradient(135deg, #6366f1, #a855f7)" },
-};
+import DynamicIcon from "../DynamicIcon";
 
 export default function Skills({ skills }) {
   const ref = useRef(null);
@@ -19,12 +10,25 @@ export default function Skills({ skills }) {
 
   if (!skills || skills.length === 0) return null;
 
-  // Group skills by category
+  // Group skills by category using the relation
   const grouped = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    acc[skill.category].push(skill);
+    const categoryName = skill.categoryRel?.name || "Other";
+    if (!acc[categoryName]) {
+      acc[categoryName] = {
+        skills: [],
+        meta: {
+          icon: skill.categoryRel?.icon || "FiCode",
+          gradient: skill.categoryRel?.gradient || "linear-gradient(135deg, #6366f1, #a855f7)",
+          order: skill.categoryRel?.order || 99,
+        },
+      };
+    }
+    acc[categoryName].skills.push(skill);
     return acc;
   }, {});
+
+  // Sort categories by their display order
+  const sortedCategories = Object.entries(grouped).sort((a, b) => a[1].meta.order - b[1].meta.order);
 
   return (
     <section className="section" id="skills" ref={ref}>
@@ -36,13 +40,13 @@ export default function Skills({ skills }) {
         </motion.div>
 
         <div className="skills-masonry">
-          {Object.entries(grouped).map(([category, categorySkills], catIndex) => {
-            const meta = categoryMeta[category] || categoryMeta.Other;
+          {sortedCategories.map(([category, data], catIndex) => {
+            const { skills: categorySkills, meta } = data;
             return (
               <motion.div key={category} className="skill-card" initial={{ opacity: 0, y: 40 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: 0.12 * catIndex }}>
                 <div className="skill-card-header">
                   <div className="skill-card-icon" style={{ background: meta.gradient }}>
-                    {meta.icon}
+                    <DynamicIcon name={meta.icon} />
                   </div>
                   <h3 className="skill-card-title">{category}</h3>
                   <span className="skill-card-count">{categorySkills.length} skills</span>
@@ -60,7 +64,7 @@ export default function Skills({ skills }) {
                       }}
                       whileHover={{ scale: 1.08, y: -2 }}
                     >
-                      <span className="skill-tag-dot" style={{ background: meta.gradient }} />
+                      <DynamicIcon name={skill.icon} style={{ fontSize: "1rem", marginRight: "8px" }} />
                       {skill.name}
                     </motion.span>
                   ))}

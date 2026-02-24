@@ -16,7 +16,12 @@ async function getData() {
       prisma.profile.findFirst().catch(() => null),
       prisma.experience.findMany({ orderBy: { order: "asc" } }).catch(() => []),
       prisma.project.findMany({ orderBy: { order: "asc" } }).catch(() => []),
-      prisma.skill.findMany({ orderBy: { order: "asc" } }).catch(() => []),
+      prisma.skill
+        .findMany({
+          orderBy: { order: "asc" },
+          include: { categoryRel: true },
+        })
+        .catch(() => []),
     ]);
 
     return { profile, experiences, projects, skills };
@@ -31,7 +36,7 @@ export default async function Home() {
 
   return (
     <>
-      {/* <Navbar /> */}
+      <Navbar />
       <main>
         <Hero profile={profile} />
         <About profile={profile} experienceCount={experiences.length} projectCount={projects.length} skillCount={skills.length} />
