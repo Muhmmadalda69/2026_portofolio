@@ -52,13 +52,13 @@ model Project {
 }
 
 model Skill {
-  id         Int            @id @default(autoincrement())
-  name       String
-  category   String? // Keeping temporarily for migration, made optional
-  level      Int            @default(80)
-  icon       String?
-  order      Int            @default(0)
-  categoryId Int?
+  id          Int            @id @default(autoincrement())
+  name        String
+  category    String?        // Keeping temporarily for migration, made optional
+  level       Int            @default(80)
+  icon        String?
+  order       Int            @default(0)
+  categoryId  Int?
   categoryRel SkillCategory? @relation(fields: [categoryId], references: [id])
 }
 

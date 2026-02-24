@@ -42,7 +42,7 @@ export default function Navbar() {
         <ul className={`nav-links ${mobileOpen ? "open" : ""}`}>
           {mobileOpen && (
             <button className="nav-hamburger" onClick={() => setMobileOpen(false)} style={{ position: "absolute", top: 24, right: 24 }}>
-              <FiX size={24} color="var(--text-primary)" />
+              <FiX size={24} color="var(--accent-secondary)" />
             </button>
           )}
           {navItems.map((item, i) => (
@@ -54,9 +54,11 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <button className="nav-hamburger" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
-          <FiMenu size={24} />
-        </button>
+        {!mobileOpen && (
+          <button className="nav-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+            <FiMenu size={24} color="var(--accent-secondary)" />
+          </button>
+        )}
       </div>
     </motion.nav>
   );

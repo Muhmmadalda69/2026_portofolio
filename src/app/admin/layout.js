@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
-import { FiHome, FiBriefcase, FiFolder, FiStar, FiUser, FiLogOut, FiExternalLink } from "react-icons/fi";
+import { FiHome, FiBriefcase, FiFolder, FiStar, FiUser, FiLogOut, FiExternalLink, FiAward } from "react-icons/fi";
 import "./admin.css";
 
 const navItems = [
