@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FiHome, FiBriefcase, FiFolder, FiStar, FiUser, FiLogOut, FiExternalLink, FiAward } from "react-icons/fi";
 import "./admin.css";
@@ -17,22 +17,36 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }) {
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const supabase = createClient();
 
   useEffect(() => {
-    if (status === "unauthenticated" && pathname !== "/admin/login") {
-      router.push("/admin/login");
+    async function checkUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+
+      if (!user && pathname !== "/admin/login") {
+        router.push("/admin/login");
+      }
     }
-  }, [status, pathname, router]);
+    checkUser();
+  }, [pathname, router, supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/admin/login");
+  };
 
   // Login page - no sidebar
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <div className="loading-skeleton" style={{ width: 200, height: 20 }} />
@@ -40,7 +54,7 @@ export default function AdminLayout({ children }) {
     );
   }
 
-  if (!session) {
+  if (!user && pathname !== "/admin/login") {
     return null;
   }
 
@@ -68,7 +82,7 @@ export default function AdminLayout({ children }) {
             View Site
           </a>
 
-          <button className="admin-nav-item" onClick={() => signOut({ callbackUrl: "/admin/login" })}>
+          <button className="admin-nav-item" onClick={handleSignOut}>
             <span className="icon">
               <FiLogOut />
             </span>

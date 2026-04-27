@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import bcrypt from "bcryptjs";
 
 export async function PUT(request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { email, password, name } = await request.json();
 
-    // Find the current admin user
+    // Find the current admin user (now using Supabase email)
     const admin = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!admin) {

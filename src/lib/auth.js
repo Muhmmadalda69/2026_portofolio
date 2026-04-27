@@ -1,11 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "../utils/supabase/server";
 
 export async function getSession() {
-  return await getServerSession(authOptions);
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
 }
 
 export async function isAuthenticated() {
-  const session = await getSession();
-  return !!session;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return !!user;
 }

@@ -1,5 +1,4 @@
 import "./globals.css";
-import AuthProvider from "@/components/AuthProvider";
 
 export const metadata = {
   title: "Portfolio | Full Stack Developer",
@@ -16,10 +15,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <div className="grid-bg" />
-          {children}
-        </AuthProvider>
+        <div className="grid-bg" />
+        {children}
       </body>
     </html>
   );
