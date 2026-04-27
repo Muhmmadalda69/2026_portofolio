@@ -36,9 +36,9 @@ export async function POST(request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
     const filePath = `${fileName}`;
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage - MENGGUNAKAN NAMA BUCKET 'portofolio'
     const { data, error } = await supabase.storage
-      .from('portfolio')
+      .from('portofolio')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false
@@ -46,12 +46,12 @@ export async function POST(request) {
 
     if (error) {
       console.error("Supabase storage error:", error);
-      return NextResponse.json({ error: "Failed to upload to storage" }, { status: 500 });
+      return NextResponse.json({ error: error.message || "Failed to upload to storage" }, { status: 500 });
     }
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('portfolio')
+      .from('portofolio')
       .getPublicUrl(filePath);
 
     return NextResponse.json({ url: publicUrl });
