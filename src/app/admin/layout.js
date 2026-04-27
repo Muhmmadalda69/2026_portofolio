@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FiHome, FiBriefcase, FiFolder, FiStar, FiUser, FiLogOut, FiExternalLink, FiAward } from "react-icons/fi";
+import { FiHome, FiBriefcase, FiFolder, FiStar, FiUser, FiLogOut, FiExternalLink, FiAward, FiMenu, FiX } from "react-icons/fi";
 import "./admin.css";
 
 const navItems = [
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     async function checkUser() {
@@ -35,6 +36,11 @@ export default function AdminLayout({ children }) {
     }
     checkUser();
   }, [pathname, router, supabase]);
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -59,11 +65,25 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <Link href="/admin" className="admin-sidebar-logo">
-          Porto<span style={{ color: "var(--accent-pink)" }}>.</span> Admin
-        </Link>
+    <div className={`admin-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
+      {/* Floating Mobile Toggle Button */}
+      <button className="admin-hamburger" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle Menu">
+        {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+      </button>
+
+      {/* Overlay */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
+      <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="admin-sidebar-header">
+          <Link href="/admin" className="admin-sidebar-logo">
+            Porto<span style={{ color: "var(--accent-pink)" }}>.</span> Admin
+          </Link>
+          {/* Close button inside sidebar for mobile */}
+          <button className="sidebar-close-mobile" onClick={() => setSidebarOpen(false)}>
+            <FiX size={24} />
+          </button>
+        </div>
 
         <nav className="admin-nav">
           {navItems.map((item) => (
