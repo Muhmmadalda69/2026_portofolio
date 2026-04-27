@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-
 export async function POST(request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -33,19 +31,30 @@ export async function POST(request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create uploads directory if not exists
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
     // Generate unique filename
-    const ext = path.extname(file.name);
-    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
-    const filePath = path.join(uploadsDir, uniqueName);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    const filePath = `${fileName}`;
 
-    await writeFile(filePath, buffer);
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('portfolio')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false
+      });
 
-    const url = `/uploads/${uniqueName}`;
-    return NextResponse.json({ url });
+    if (error) {
+      console.error("Supabase storage error:", error);
+      return NextResponse.json({ error: "Failed to upload to storage" }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('portfolio')
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({ url: publicUrl });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
